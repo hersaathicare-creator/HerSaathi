@@ -3,6 +3,7 @@ import { Linking, StyleSheet, Switch, Text, TextInput, View } from "react-native
 import {
   Bell,
   CheckCircle2,
+  ClipboardCheck,
   Cloud,
   Database,
   DownloadCloud,
@@ -243,6 +244,10 @@ export default function ProfileScreen({ appState, refreshAppState, navigate }) {
     }
   };
 
+  const explainUpgradeStatus = () => {
+    setStatus("Premium payments are intentionally deferred. Pragya will unlock after the real subscription system is connected.");
+  };
+
   const periodCount = appState.periodEntries?.length || 0;
   const symptomCount = appState.symptomLogs?.length || 0;
   const checkInCount = appState.checkIns?.length || 0;
@@ -388,6 +393,15 @@ export default function ProfileScreen({ appState, refreshAppState, navigate }) {
       </Card>
 
       <Card>
+        <View style={styles.titleRow}>
+          <ClipboardCheck size={20} color={colors.plum} />
+          <Text style={styles.cardTitle}>Testing & store prep</Text>
+        </View>
+        <Text style={styles.body}>Open the closed-testing checklist, deferred services, and support diagnostics.</Text>
+        <Button title="Open Testing Center" variant="secondary" onPress={() => navigate("readiness")} style={styles.reportButton} />
+      </Card>
+
+      <Card>
         <View style={styles.settingRow}>
           <View style={styles.settingText}>
             <View style={styles.titleRow}>
@@ -441,7 +455,7 @@ export default function ProfileScreen({ appState, refreshAppState, navigate }) {
           <Text style={styles.cardTitle}>Subscription</Text>
         </View>
         <Text style={styles.body}>Free includes Saathi with static answers and Gemini. Premium unlocks Pragya for advanced actions.</Text>
-        <Button title="Upgrade" />
+        <Button title="Premium Setup Pending" variant="secondary" onPress={explainUpgradeStatus} style={styles.reportButton} />
       </Card>
 
       {status ? <Text style={styles.status}>{status}</Text> : null}

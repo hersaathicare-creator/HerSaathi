@@ -15,6 +15,7 @@ import { DMSans_500Medium } from "@expo-google-fonts/dm-sans/500Medium";
 import { DMSans_600SemiBold } from "@expo-google-fonts/dm-sans/600SemiBold";
 import { DMSans_700Bold } from "@expo-google-fonts/dm-sans/700Bold";
 
+import { ErrorBoundary } from "./src/components/ErrorBoundary";
 import AIAssistantScreen from "./src/screens/AIAssistantScreen";
 import CareScreen from "./src/screens/CareScreen";
 import DataManagementScreen from "./src/screens/DataManagementScreen";
@@ -22,6 +23,7 @@ import HomeScreen from "./src/screens/HomeScreen";
 import LegalCenterScreen from "./src/screens/LegalCenterScreen";
 import OnboardingScreen from "./src/screens/OnboardingScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
+import ReadinessScreen from "./src/screens/ReadinessScreen";
 import ReliefModeScreen from "./src/screens/ReliefModeScreen";
 import ReportsScreen from "./src/screens/ReportsScreen";
 import TrackScreen from "./src/screens/TrackScreen";
@@ -83,6 +85,7 @@ function MainApp({ appState, refreshAppState, completeOnboarding }) {
   const [reportsOpen, setReportsOpen] = useState(false);
   const [dataManagementOpen, setDataManagementOpen] = useState(false);
   const [legalOpen, setLegalOpen] = useState(false);
+  const [readinessOpen, setReadinessOpen] = useState(false);
   const [trackMode, setTrackMode] = useState(null);
 
   const navigate = useCallback((target, options = {}) => {
@@ -100,6 +103,10 @@ function MainApp({ appState, refreshAppState, completeOnboarding }) {
     }
     if (target === "legal") {
       setLegalOpen(true);
+      return;
+    }
+    if (target === "readiness") {
+      setReadinessOpen(true);
       return;
     }
     if (target === "track" && options.mode) {
@@ -139,11 +146,12 @@ function MainApp({ appState, refreshAppState, completeOnboarding }) {
         />
       )}
       {legalOpen && <LegalCenterScreen appState={appState} onClose={() => setLegalOpen(false)} />}
+      {readinessOpen && <ReadinessScreen appState={appState} onClose={() => setReadinessOpen(false)} />}
     </SafeAreaView>
   );
 }
 
-export default function App() {
+function AppRoot() {
   const [booting, setBooting] = useState(true);
   const [appState, setAppState] = useState(null);
   const [fontsLoaded] = useFonts({
@@ -215,6 +223,14 @@ export default function App() {
       <StatusBar style="dark" />
       <MainApp appState={appState} refreshAppState={refreshAppState} completeOnboarding={completeOnboarding} />
     </SafeAreaProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <AppRoot />
+    </ErrorBoundary>
   );
 }
 

@@ -38,7 +38,7 @@ export async function scheduleHerSaathiNotifications(settings, cycleInfo) {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "HerSaathi",
-        body: "How are you today? 💜"
+        body: "How are you today?"
       },
       trigger: { hour: 9, minute: 0, repeats: true }
     });
@@ -48,7 +48,7 @@ export async function scheduleHerSaathiNotifications(settings, cycleInfo) {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "Wellness tip",
-        body: "Remember to hydrate today 🌸"
+        body: "Remember to hydrate today."
       },
       trigger: { hour: 15, minute: 0, repeats: true }
     });
