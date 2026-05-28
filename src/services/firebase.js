@@ -9,6 +9,7 @@ import {
   signOut
 } from "firebase/auth";
 import { deleteDoc, doc, getDoc, getFirestore, serverTimestamp, setDoc } from "firebase/firestore";
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { appConfig } from "../constants/app";
 
 const firebaseConfig = {
@@ -24,6 +25,7 @@ const firebaseConfig = {
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const functions = getFunctions(app, "asia-south1");
 const provider = new GoogleAuthProvider();
 
 provider.setCustomParameters({ prompt: "select_account" });
@@ -76,6 +78,12 @@ export async function downloadWellnessData(uid) {
 export async function deleteWellnessData(uid) {
   assertSignedIn(uid);
   await deleteDoc(wellnessDocRef(uid));
+}
+
+export async function askHerSaathiAI(payload) {
+  const callable = httpsCallable(functions, "askHerSaathiAI");
+  const result = await callable(payload);
+  return result.data;
 }
 
 export function buildWellnessCloudPayload(appState, dataScopes = {}) {

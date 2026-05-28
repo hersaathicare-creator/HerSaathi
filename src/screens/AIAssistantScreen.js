@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Send, Sparkles } from "lucide-react-native";
 
 import { Button } from "../components/Button";
@@ -7,6 +7,7 @@ import { Card } from "../components/Card";
 import { HealthDisclaimer } from "../components/Feedback";
 import { Screen } from "../components/Screen";
 import { colors, fonts, typography } from "../constants/theme";
+import { askHerSaathiAI } from "../services/firebase";
 import { assistantModes, buildAiContext, getAssistantReply, suggestedQuestions } from "../utils/ai";
 import { getCycleInfo } from "../utils/cycle";
 import { incrementAiUsage, saveAiMessages } from "../utils/storage";
@@ -23,40 +24,59 @@ export default function AIAssistantScreen({ appState, refreshAppState }) {
           {
             id: "welcome",
             role: "ai",
-            text: "Hi, I’m your HerSaathi assistant. Ask about cramps, mood, food, movement, remedies, or your records."
+            text: "Hi, I'm your HerSaathi assistant. Ask about cramps, mood, food, movement, remedies, or your records."
           }
         ]
   );
+  const [sending, setSending] = useState(false);
+  const [remoteUsage, setRemoteUsage] = useState(null);
   const scrollRef = useRef(null);
 
   const cycleInfo = useMemo(() => getCycleInfo(appState.cycle), [appState.cycle]);
   const context = useMemo(() => buildAiContext(appState, cycleInfo), [appState, cycleInfo]);
   const remaining = Math.max(0, freeDailyLimit - (appState.aiUsage?.count || 0));
+  const cloudReady = appState.account?.status === "signed-in";
+  const subtitle = cloudReady
+    ? `${remaining} free messages left today. Cloud AI ready.`
+    : `${remaining} free messages left today. Sign in for cloud AI.`;
 
   const sendQuestion = async (text = question) => {
     const trimmed = text.trim();
-    if (!trimmed || remaining <= 0) return;
+    if (!trimmed || remaining <= 0 || sending) return;
 
     const userMessage = { id: `${Date.now()}-u`, role: "user", text: trimmed };
-    const reply = await getAssistantReply(trimmed, mode, context);
-    const aiMessage = {
-      id: `${Date.now()}-a`,
-      role: "ai",
-      text: reply.text,
-      source: reply.source
-    };
-    const nextMessages = [...messages, userMessage, aiMessage];
+    const nextMessages = [...messages, userMessage];
     setMessages(nextMessages);
     setQuestion("");
-    await saveAiMessages(nextMessages);
-    await incrementAiUsage();
-    await refreshAppState();
     requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: true }));
+
+    setSending(true);
+    try {
+      const reply = await getAssistantReply(trimmed, mode, context, {
+        askCloud: cloudReady ? askHerSaathiAI : null
+      });
+      const aiMessage = {
+        id: `${Date.now()}-a`,
+        role: "ai",
+        text: reply.text,
+        source: reply.source,
+        usage: reply.usage || null
+      };
+      const finalMessages = [...nextMessages, aiMessage];
+      setMessages(finalMessages);
+      if (reply.usage) setRemoteUsage(reply.usage);
+      await saveAiMessages(finalMessages);
+      await incrementAiUsage();
+      await refreshAppState();
+    } finally {
+      setSending(false);
+      requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: true }));
+    }
   };
 
   return (
     <KeyboardAvoidingView style={styles.keyboard} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <Screen title="Ask AI" subtitle={`${remaining} free messages left today.`} contentContainerStyle={styles.screen}>
+      <Screen title="Ask AI" subtitle={subtitle} contentContainerStyle={styles.screen}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.modeScroller}>
           {assistantModes.map((item) => (
             <Button
@@ -75,13 +95,25 @@ export default function AIAssistantScreen({ appState, refreshAppState }) {
             <Text style={styles.contextTitle}>Private context</Text>
           </View>
           <Text style={styles.contextText}>{JSON.stringify(context)}</Text>
+          {remoteUsage ? (
+            <Text style={styles.cloudUsage}>
+              Cloud AI usage today: {remoteUsage.count}/{remoteUsage.limit}
+            </Text>
+          ) : null}
         </Card>
 
         <HealthDisclaimer compact />
 
         <View style={styles.suggestionRow}>
           {suggestedQuestions.map((item) => (
-            <Button key={item} title={item} variant="soft" style={styles.suggestButton} onPress={() => sendQuestion(item)} />
+            <Button
+              key={item}
+              title={item}
+              variant="soft"
+              style={styles.suggestButton}
+              disabled={sending || remaining <= 0}
+              onPress={() => sendQuestion(item)}
+            />
           ))}
         </View>
 
@@ -90,9 +122,20 @@ export default function AIAssistantScreen({ appState, refreshAppState }) {
             {messages.map((message) => (
               <View key={message.id} style={[styles.bubble, message.role === "user" ? styles.userBubble : styles.aiBubble]}>
                 <Text style={[styles.bubbleText, message.role === "user" && styles.userText]}>{message.text}</Text>
-                {message.source ? <Text style={styles.sourceText}>{message.source}</Text> : null}
+                {message.source ? (
+                  <Text style={styles.sourceText}>
+                    {message.source}
+                    {message.usage ? ` ${message.usage.count}/${message.usage.limit}` : ""}
+                  </Text>
+                ) : null}
               </View>
             ))}
+            {sending ? (
+              <View style={[styles.bubble, styles.aiBubble, styles.thinkingBubble]}>
+                <ActivityIndicator size="small" color={colors.plum} />
+                <Text style={styles.sourceText}>Thinking...</Text>
+              </View>
+            ) : null}
             {remaining <= 0 ? <Text style={styles.limitText}>Daily free AI limit reached. Come back tomorrow.</Text> : null}
           </ScrollView>
           <View style={styles.inputRow}>
@@ -107,11 +150,11 @@ export default function AIAssistantScreen({ appState, refreshAppState }) {
             <Button
               variant="primary"
               style={styles.sendButton}
-              disabled={!question.trim() || remaining <= 0}
+              disabled={sending || !question.trim() || remaining <= 0}
               onPress={() => sendQuestion()}
               accessibilityLabel="Send message"
             >
-              <Send size={20} color={colors.white} />
+              {sending ? <ActivityIndicator size="small" color={colors.white} /> : <Send size={20} color={colors.white} />}
             </Button>
           </View>
         </Card>
@@ -150,6 +193,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
     color: colors.ink
   },
+  cloudUsage: {
+    ...typography.smallMedium,
+    marginTop: 8,
+    color: colors.mulberry
+  },
   suggestionRow: {
     gap: 8
   },
@@ -180,6 +228,11 @@ const styles = StyleSheet.create({
   userBubble: {
     alignSelf: "flex-end",
     backgroundColor: colors.plum
+  },
+  thinkingBubble: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8
   },
   bubbleText: {
     ...typography.body
