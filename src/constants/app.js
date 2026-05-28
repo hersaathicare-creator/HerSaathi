@@ -6,7 +6,10 @@ export const appConfig = {
   cloudProvider: "Cloud Firestore",
   androidPackage: "com.hersaathi.app",
   androidGoogleWebClientId: "58884450954-1rbu2duc7fr7ca5tn9sep1i5o5s8rg90.apps.googleusercontent.com",
-  androidGoogleClientId: ""
+  androidGoogleClientId: "",
+  legalVersion: "2026-05-28",
+  privacyVersion: "2026-05-28",
+  termsVersion: "2026-05-28"
 };
 
 export const syncScopes = [

@@ -104,6 +104,7 @@ export function buildWellnessCloudPayload(appState, dataScopes = {}) {
     app: "HerSaathi",
     version: 2,
     clientUpdatedAt: new Date().toISOString(),
+    legalConsent: appState.legalConsent || null,
     dataScopes,
     data
   };

@@ -112,6 +112,7 @@ function normalizeImportData(source, errors) {
   const symptomLogs = normalizeSymptomLogs(source.symptomLogs, errors);
   const aiUsage = normalizeAiUsage(source.aiUsage);
   const aiMessages = normalizeAiMessages(source.aiMessages);
+  const legalConsent = normalizeLegalConsent(source.legalConsent);
 
   return {
     onboardingComplete: Boolean(source.onboardingComplete),
@@ -123,7 +124,8 @@ function normalizeImportData(source, errors) {
     periodEntries,
     symptomLogs,
     aiUsage,
-    aiMessages
+    aiMessages,
+    legalConsent
   };
 }
 
@@ -299,6 +301,15 @@ function normalizeAiMessages(aiMessages) {
     });
     return items;
   }, []).map(removeUndefined);
+}
+
+function normalizeLegalConsent(legalConsent = null) {
+  if (!legalConsent || typeof legalConsent !== "object" || Array.isArray(legalConsent)) return null;
+  return {
+    acceptedAt: legalConsent.acceptedAt ? safeString(legalConsent.acceptedAt, "").slice(0, 40) : null,
+    privacyVersion: legalConsent.privacyVersion ? safeString(legalConsent.privacyVersion, "").slice(0, 40) : null,
+    termsVersion: legalConsent.termsVersion ? safeString(legalConsent.termsVersion, "").slice(0, 40) : null
+  };
 }
 
 function normalizeSymptoms(symptoms) {

@@ -8,6 +8,7 @@ import { Card } from "../components/Card";
 import { DatePickerField } from "../components/DatePickerField";
 import { ErrorList } from "../components/Feedback";
 import { Field, SegmentedOptions } from "../components/FormControls";
+import { buildLegalConsent, legalSummary } from "../constants/legal";
 import { colors, fonts, layout, typography } from "../constants/theme";
 import { getCycleInfo } from "../utils/cycle";
 import { toDateKey } from "../utils/date";
@@ -62,7 +63,7 @@ export default function OnboardingScreen({ onComplete }) {
       return;
     }
 
-    await completeOnboarding({ ageGroup, cycle, notificationsEnabled });
+    await completeOnboarding({ ageGroup, cycle, notificationsEnabled, legalConsent: buildLegalConsent() });
 
     if (notificationsEnabled) {
       await scheduleHerSaathiNotifications(
@@ -158,7 +159,13 @@ export default function OnboardingScreen({ onComplete }) {
               <ShieldCheck size={30} color={colors.plum} />
             </View>
             <Text style={styles.title}>Your data stays on your device.</Text>
-            <Text style={styles.copy}>Stage 1 stores cycle, mood, and symptom records locally with AsyncStorage.</Text>
+            <Text style={styles.copy}>HerSaathi stores cycle, mood, and symptom records locally first. Cloud sync and cloud AI are optional.</Text>
+            <View style={styles.legalBox}>
+              <Text style={styles.legalTitle}>Privacy, terms, and safety</Text>
+              <Text style={styles.legalText}>
+                By continuing, you accept the Privacy Policy and Terms of Use version {legalSummary.privacyVersion}. HerSaathi is wellness support only, not medical diagnosis or emergency care.
+              </Text>
+            </View>
             <View style={styles.switchRow}>
               <View style={styles.switchText}>
                 <View style={styles.inlineTitle}>
@@ -261,6 +268,22 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: layout.radius,
     backgroundColor: colors.white
+  },
+  legalBox: {
+    padding: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: layout.radius,
+    backgroundColor: colors.white,
+    gap: 4
+  },
+  legalTitle: {
+    ...typography.bodyMedium,
+    color: colors.ink
+  },
+  legalText: {
+    ...typography.small,
+    color: colors.muted
   },
   switchText: {
     flex: 1,

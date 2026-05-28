@@ -11,7 +11,8 @@ export const storageKeys = {
   periodEntries: "hersaathi:periodEntries",
   symptomLogs: "hersaathi:symptomLogs",
   aiUsage: "hersaathi:aiUsage",
-  aiMessages: "hersaathi:aiMessages"
+  aiMessages: "hersaathi:aiMessages",
+  legalConsent: "hersaathi:legalConsent"
 };
 
 const defaultState = {
@@ -64,7 +65,8 @@ const defaultState = {
     date: toDateKey(),
     count: 0
   },
-  aiMessages: []
+  aiMessages: [],
+  legalConsent: null
 };
 
 async function getJSON(key, fallback) {
@@ -93,7 +95,8 @@ export async function loadAppState() {
     periodEntries,
     symptomLogs,
     aiUsage,
-    aiMessages
+    aiMessages,
+    legalConsent
   ] = await Promise.all([
     getJSON(storageKeys.onboardingComplete, defaultState.onboardingComplete),
     getJSON(storageKeys.profile, defaultState.profile),
@@ -104,7 +107,8 @@ export async function loadAppState() {
     getJSON(storageKeys.periodEntries, defaultState.periodEntries),
     getJSON(storageKeys.symptomLogs, defaultState.symptomLogs),
     getJSON(storageKeys.aiUsage, defaultState.aiUsage),
-    getJSON(storageKeys.aiMessages, defaultState.aiMessages)
+    getJSON(storageKeys.aiMessages, defaultState.aiMessages),
+    getJSON(storageKeys.legalConsent, defaultState.legalConsent)
   ]);
 
   return {
@@ -121,11 +125,12 @@ export async function loadAppState() {
     periodEntries,
     symptomLogs,
     aiUsage: aiUsage.date === toDateKey() ? aiUsage : { date: toDateKey(), count: 0 },
-    aiMessages
+    aiMessages,
+    legalConsent
   };
 }
 
-export async function completeOnboarding({ ageGroup, cycle, notificationsEnabled }) {
+export async function completeOnboarding({ ageGroup, cycle, notificationsEnabled, legalConsent = null }) {
   await Promise.all([
     setJSON(storageKeys.profile, { ...defaultState.profile, ageGroup }),
     setJSON(storageKeys.cycle, { ...defaultState.cycle, ...cycle }),
@@ -133,6 +138,7 @@ export async function completeOnboarding({ ageGroup, cycle, notificationsEnabled
       ...defaultState.notifications,
       enabled: Boolean(notificationsEnabled)
     }),
+    setJSON(storageKeys.legalConsent, legalConsent),
     setJSON(storageKeys.onboardingComplete, true)
   ]);
 }
@@ -384,7 +390,8 @@ export async function restoreLocalData(data) {
     periodEntries: Array.isArray(data.periodEntries) ? data.periodEntries : [],
     symptomLogs: Array.isArray(data.symptomLogs) ? data.symptomLogs : [],
     aiUsage: { ...defaultState.aiUsage, ...(data.aiUsage || {}) },
-    aiMessages: Array.isArray(data.aiMessages) ? data.aiMessages : []
+    aiMessages: Array.isArray(data.aiMessages) ? data.aiMessages : [],
+    legalConsent: data.legalConsent || null
   };
 
   await Promise.all([
@@ -397,7 +404,8 @@ export async function restoreLocalData(data) {
     setJSON(storageKeys.periodEntries, nextState.periodEntries),
     setJSON(storageKeys.symptomLogs, nextState.symptomLogs),
     setJSON(storageKeys.aiUsage, nextState.aiUsage),
-    setJSON(storageKeys.aiMessages, nextState.aiMessages)
+    setJSON(storageKeys.aiMessages, nextState.aiMessages),
+    setJSON(storageKeys.legalConsent, nextState.legalConsent)
   ]);
 
   return loadAppState();
@@ -414,6 +422,7 @@ export async function applyCloudWellnessData(cloudData) {
     symptomLogs: Array.isArray(incoming.symptomLogs) ? incoming.symptomLogs : current.symptomLogs,
     checkIns: Array.isArray(incoming.checkIns) ? incoming.checkIns : current.checkIns,
     aiMessages: Array.isArray(incoming.aiMessages) ? incoming.aiMessages : current.aiMessages,
+    legalConsent: cloudData?.legalConsent || current.legalConsent,
     account: {
       ...current.account,
       lastCloudDownloadAt: new Date().toISOString(),

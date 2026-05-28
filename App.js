@@ -19,6 +19,7 @@ import AIAssistantScreen from "./src/screens/AIAssistantScreen";
 import CareScreen from "./src/screens/CareScreen";
 import DataManagementScreen from "./src/screens/DataManagementScreen";
 import HomeScreen from "./src/screens/HomeScreen";
+import LegalCenterScreen from "./src/screens/LegalCenterScreen";
 import OnboardingScreen from "./src/screens/OnboardingScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
 import ReliefModeScreen from "./src/screens/ReliefModeScreen";
@@ -47,7 +48,7 @@ function SplashScreen({ fontsLoaded = false }) {
         <Image source={logo} resizeMode="contain" style={styles.logo} />
       </View>
       <ActivityIndicator color={colors.plum} />
-      <Text style={fontsLoaded ? styles.splashText : styles.splashTextFallback}>Your wellness companion 💜</Text>
+      <Text style={fontsLoaded ? styles.splashText : styles.splashTextFallback}>Your wellness companion</Text>
     </LinearGradient>
   );
 }
@@ -81,6 +82,7 @@ function MainApp({ appState, refreshAppState, completeOnboarding }) {
   const [reliefOpen, setReliefOpen] = useState(false);
   const [reportsOpen, setReportsOpen] = useState(false);
   const [dataManagementOpen, setDataManagementOpen] = useState(false);
+  const [legalOpen, setLegalOpen] = useState(false);
   const [trackMode, setTrackMode] = useState(null);
 
   const navigate = useCallback((target, options = {}) => {
@@ -94,6 +96,10 @@ function MainApp({ appState, refreshAppState, completeOnboarding }) {
     }
     if (target === "data-management") {
       setDataManagementOpen(true);
+      return;
+    }
+    if (target === "legal") {
+      setLegalOpen(true);
       return;
     }
     if (target === "track" && options.mode) {
@@ -132,6 +138,7 @@ function MainApp({ appState, refreshAppState, completeOnboarding }) {
           onClose={() => setDataManagementOpen(false)}
         />
       )}
+      {legalOpen && <LegalCenterScreen appState={appState} onClose={() => setLegalOpen(false)} />}
     </SafeAreaView>
   );
 }

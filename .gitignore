@@ -9,3 +9,8 @@ yarn-debug.log*
 yarn-error.log*
 dist/
 build/
+*Api key*.docx
+~$*.docx
+*.key
+*.pem
+*.p12

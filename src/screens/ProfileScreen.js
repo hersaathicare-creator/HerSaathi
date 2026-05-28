@@ -12,6 +12,7 @@ import {
   LogOut,
   Mail,
   RefreshCcw,
+  Scale,
   ShieldCheck,
   Trash2,
   UploadCloud,
@@ -222,6 +223,26 @@ export default function ProfileScreen({ appState, refreshAppState, navigate }) {
     }
   };
 
+  const requestDataDeletion = async () => {
+    const subject = "HerSaathi data deletion request";
+    const body = [
+      "Hello HerSaathi Support,",
+      "",
+      "Please help me delete my HerSaathi account/cloud data.",
+      "",
+      `Signed-in email: ${account.email || "not signed in"}`,
+      `Firebase UID: ${account.uid || "not available"}`,
+      "",
+      "I understand local data can be deleted from Profile > Data Management on my device."
+    ].join("\n");
+
+    try {
+      await Linking.openURL(`mailto:${appConfig.officialEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+    } catch {
+      setStatus(`Email ${appConfig.officialEmail} with subject: ${subject}.`);
+    }
+  };
+
   const periodCount = appState.periodEntries?.length || 0;
   const symptomCount = appState.symptomLogs?.length || 0;
   const checkInCount = appState.checkIns?.length || 0;
@@ -390,6 +411,19 @@ export default function ProfileScreen({ appState, refreshAppState, navigate }) {
           <Text style={styles.cardTitle}>Privacy</Text>
         </View>
         <Text style={styles.body}>Cloud data is stored under your Firebase user id and protected by Firestore user rules.</Text>
+        <View style={styles.actionRow}>
+          <Button title="Legal & Safety" variant="secondary" onPress={() => navigate("legal")} style={styles.actionButton}>
+            <Scale size={18} color={colors.mulberry} />
+            <Text style={styles.secondaryText}>Legal & Safety</Text>
+          </Button>
+          <Button title="Request Deletion" variant="secondary" onPress={requestDataDeletion} style={styles.actionButton}>
+            <Trash2 size={18} color={colors.mulberry} />
+            <Text style={styles.secondaryText}>Request Deletion</Text>
+          </Button>
+        </View>
+        {appState.legalConsent?.acceptedAt ? (
+          <Text style={styles.legalMeta}>Accepted terms: {new Date(appState.legalConsent.acceptedAt).toLocaleDateString()}</Text>
+        ) : null}
       </Card>
 
       <Card>
@@ -580,6 +614,11 @@ const styles = StyleSheet.create({
   },
   privacyCard: {
     backgroundColor: colors.mint
+  },
+  legalMeta: {
+    ...typography.small,
+    marginTop: 10,
+    color: colors.muted
   },
   dangerCard: {
     backgroundColor: colors.lemon
