@@ -286,7 +286,16 @@ function normalizeAiMessages(aiMessages) {
       id: safeId(source.id, `message-${index}`),
       role,
       text: text.slice(0, 1200),
-      source: source.source ? safeString(source.source, "").slice(0, 80) : undefined
+      source: source.source ? safeString(source.source, "").slice(0, 80) : undefined,
+      characterKey: ["saathi", "pragya"].includes(source.characterKey) ? source.characterKey : undefined,
+      characterName: source.characterName ? safeString(source.characterName, "").slice(0, 40) : undefined,
+      usage: source.usage && typeof source.usage === "object"
+        ? {
+            date: isValidDateKey(source.usage.date) ? source.usage.date : undefined,
+            count: Math.max(0, Math.min(toInteger(source.usage.count, 0), 25)),
+            limit: Math.max(0, Math.min(toInteger(source.usage.limit, 0), 25))
+          }
+        : undefined
     });
     return items;
   }, []).map(removeUndefined);

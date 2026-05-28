@@ -406,7 +406,7 @@ export default function ProfileScreen({ appState, refreshAppState, navigate }) {
           <WandSparkles size={20} color={colors.plum} />
           <Text style={styles.cardTitle}>Subscription</Text>
         </View>
-        <Text style={styles.body}>Free plan includes 5 assistant messages per day.</Text>
+        <Text style={styles.body}>Free includes Saathi with static answers and Gemini. Premium unlocks Pragya for advanced actions.</Text>
         <Button title="Upgrade" />
       </Card>
 

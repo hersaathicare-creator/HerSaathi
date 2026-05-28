@@ -74,7 +74,25 @@ export const assistantModes = [
   "Diet & nutrition",
   "Workout expert",
   "Home remedies",
-  "Record analyser"
+  "Record analyser",
+  "Advanced actions"
+];
+
+export const assistantCharacters = [
+  {
+    key: "saathi",
+    name: "Saathi",
+    tier: "Free",
+    provider: "Static + Gemini",
+    purpose: "Daily care, wellness guidance, and record references"
+  },
+  {
+    key: "pragya",
+    name: "Pragya",
+    tier: "Premium",
+    provider: "GPT-4.1-mini",
+    purpose: "Advanced actions and structured care plans"
+  }
 ];
 
 export const suggestedQuestions = [
@@ -96,28 +114,50 @@ export function buildAiContext(appState, cycleInfo) {
 export async function getAssistantReply(question, mode, context, options = {}) {
   const trimmed = question.trim();
   const normalized = normalize(trimmed);
+  const character = getCharacterForMode(mode);
+  const isPremium = options.subscriptionTier === "premium";
   const safetyMatch = findKnowledgeMatch(normalized, safetyKnowledge);
 
   if (safetyMatch) {
     return {
+      characterKey: "saathi",
+      characterName: "Saathi",
       source: "safety guidance",
       text: safetyMatch.response
     };
   }
 
-  const localMatch = findKnowledgeMatch(normalized, localKnowledge);
-  if (localMatch) {
+  if (character.key === "pragya" && !isPremium) {
     return {
-      source: "local guidance",
-      text: localMatch.response
+      characterKey: "pragya",
+      characterName: "Pragya",
+      source: "premium locked",
+      countUsage: false,
+      text:
+        "Pragya is the advanced Premium companion for deeper actions and structured care plans. Saathi can still help with daily support, records, and common wellness questions."
     };
+  }
+
+  if (character.key === "saathi") {
+    const localMatch = findKnowledgeMatch(normalized, localKnowledge);
+    if (localMatch) {
+      return {
+        characterKey: "saathi",
+        characterName: "Saathi",
+        source: "local guidance",
+        text: localMatch.response
+      };
+    }
   }
 
   if (typeof options.askCloud !== "function") {
     return {
+      characterKey: character.key,
+      characterName: character.name,
       source: "sign-in needed",
+      countUsage: false,
       text:
-        "I can answer common wellness questions privately on this device. For a more personal AI response, please sign in with Google first."
+        `${character.name} can answer common questions privately on this device. For cloud AI, please sign in with Google first.`
     };
   }
 
@@ -125,55 +165,102 @@ export async function getAssistantReply(question, mode, context, options = {}) {
     const remote = await options.askCloud({
       question: trimmed,
       mode,
+      characterKey: character.key,
       context
     });
 
     return {
-      source: remote?.source === "openai" ? "cloud AI" : remote?.source || "cloud AI",
+      characterKey: remote?.characterKey || character.key,
+      characterName: remote?.characterName || character.name,
+      source: formatRemoteSource(remote?.source),
       text: remote?.text || "I could not generate a response right now. Please try again.",
       usage: remote?.usage || null
     };
   } catch (error) {
-    return getCloudErrorReply(error);
+    return getCloudErrorReply(error, character);
   }
 }
 
+export function getCharacterForMode(mode) {
+  return mode === "Advanced actions" ? assistantCharacters[1] : assistantCharacters[0];
+}
+
 function findKnowledgeMatch(normalizedQuestion, knowledgeBase) {
-  return knowledgeBase.find((item) => item.keywords.some((keyword) => normalizedQuestion.includes(normalize(keyword))));
+  return knowledgeBase.find((item) => item.keywords.some((keyword) => keywordMatches(normalizedQuestion, keyword)));
 }
 
 function normalize(value) {
   return value.toLowerCase().replace(/\s+/g, " ").trim();
 }
 
-function getCloudErrorReply(error) {
+function keywordMatches(normalizedQuestion, keyword) {
+  const normalizedKeyword = normalize(keyword);
+  const escaped = normalizedKeyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  if (normalizedKeyword.includes(" ")) {
+    return normalizedQuestion.includes(normalizedKeyword);
+  }
+
+  return new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`).test(normalizedQuestion);
+}
+
+function getCloudErrorReply(error, character) {
   const code = error?.code || "";
   const message = error?.message || "";
 
   if (code.includes("resource-exhausted") || message.includes("Daily AI limit")) {
     return {
+      characterKey: character.key,
+      characterName: character.name,
       source: "daily limit",
-      text: "The cloud AI daily limit is finished for today. You can still ask common questions that are answered privately on this device."
+      countUsage: false,
+      text: `${character.name}'s cloud AI limit is finished for today. You can still ask common questions that are answered privately on this device.`
     };
   }
 
   if (code.includes("unauthenticated")) {
     return {
+      characterKey: character.key,
+      characterName: character.name,
       source: "sign-in needed",
-      text: "Please sign in with Google before using cloud AI."
+      countUsage: false,
+      text: `Please sign in with Google before using ${character.name}'s cloud AI.`
     };
   }
 
-  if (code.includes("failed-precondition") || message.includes("OPENAI_API_KEY")) {
+  if (code.includes("permission-denied")) {
     return {
+      characterKey: "pragya",
+      characterName: "Pragya",
+      source: "premium locked",
+      countUsage: false,
+      text:
+        "Pragya is available with Premium. Saathi remains available for free daily guidance, Gemini answers, and record references."
+    };
+  }
+
+  if (code.includes("failed-precondition") || message.includes("GEMINI_API_KEY") || message.includes("OPENAI_API_KEY")) {
+    return {
+      characterKey: character.key,
+      characterName: character.name,
       source: "setup needed",
-      text: "Cloud AI is almost ready. The secure server API key still needs to be added in Firebase Functions."
+      countUsage: false,
+      text: `${character.name}'s cloud AI is almost ready. The secure server API key still needs to be added in Firebase Functions.`
     };
   }
 
   return {
+    characterKey: character.key,
+    characterName: character.name,
     source: "cloud unavailable",
+    countUsage: false,
     text:
-      "Cloud AI is not reachable right now. Your private local answers still work for common period and wellness questions."
+      `${character.name}'s cloud AI is not reachable right now. Your private local answers still work for common period and wellness questions.`
   };
+}
+
+function formatRemoteSource(source) {
+  if (source === "gemini") return "Gemini";
+  if (source === "openai") return "GPT-4.1-mini";
+  return "cloud AI";
 }
