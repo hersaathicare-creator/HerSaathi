@@ -19,7 +19,7 @@ git push
 Run:
 
 ```powershell
-npx eas login
+npx eas-cli login
 ```
 
 If you do not have an Expo account:
@@ -34,7 +34,7 @@ If you do not have an Expo account:
 Run:
 
 ```powershell
-npx eas init
+npx eas-cli init
 ```
 
 When Expo asks to create or link a project:
@@ -66,7 +66,7 @@ The output should be an `.apk` link that can be installed on an Android phone.
 After the first EAS build has created Android credentials, run:
 
 ```powershell
-npx eas credentials --platform android
+npx eas-cli credentials --platform android
 ```
 
 Then:

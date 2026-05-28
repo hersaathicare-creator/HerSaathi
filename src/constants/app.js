@@ -5,7 +5,7 @@ export const appConfig = {
   authProvider: "Google",
   cloudProvider: "Cloud Firestore",
   androidPackage: "com.hersaathi.app",
-  androidGoogleWebClientId: "",
+  androidGoogleWebClientId: "58884450954-1rbu2duc7fr7ca5tn9sep1i5o5s8rg90.apps.googleusercontent.com",
   androidGoogleClientId: ""
 };
 
