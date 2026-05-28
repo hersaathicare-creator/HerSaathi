@@ -2,7 +2,7 @@
   "expo": {
     "name": "HerSaathi",
     "slug": "hersaathi",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "scheme": "hersaathi",
     "icon": "./image/icon.png",
@@ -25,7 +25,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.hersaathi.app",
-      "versionCode": 2
+      "versionCode": 3
     },
     "plugins": [
       "expo-notifications",
