@@ -29,12 +29,13 @@ cd D:\App\HerSaathi
 npx eas-cli build --platform android --profile preview --non-interactive
 ```
 
-After EAS finishes, paste the build URL here:
+EAS build result:
 
 ```text
-EAS build URL: pending
-APK download URL: pending
-Build result: pending
+EAS build URL: https://expo.dev/accounts/sanjeevmazumder/projects/hersaathi/builds/c031e6dc-b94f-4f0a-b0bb-e5075d40a610
+APK download URL: https://expo.dev/artifacts/eas/pJvYGhodACvuzypgy1cgUU.apk
+Build result: FINISHED
+Completed at: 2026-05-28 17:15:24 UTC
 ```
 
 ## Install On Android Phone

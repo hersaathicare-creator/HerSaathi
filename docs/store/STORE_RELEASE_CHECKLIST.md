@@ -12,9 +12,9 @@
 [ ] App icon uploaded
 [ ] Feature graphic created
 [ ] Phone screenshots captured
-[ ] Privacy Policy URL hosted and working
-[ ] Terms URL hosted and working
-[ ] Data deletion page hosted and working
+[x] Privacy Policy URL hosted and working
+[x] Terms URL hosted and working
+[x] Data deletion page hosted and working
 [ ] Internal tester emails added
 [ ] AAB built with production profile
 [ ] AAB uploaded to internal testing
@@ -46,7 +46,7 @@
 [ ] Payment/subscription system connected or Premium hidden
 [ ] Premium entitlement backend connected
 [ ] Account/cloud deletion workflow confirmed
-[ ] Public policy URLs final
+[x] Public policy URLs final
 [ ] Store screenshots final
 [ ] Data Safety final
 [ ] App signed and uploaded
@@ -60,7 +60,15 @@
 [ ] Cloud Functions not deployed live
 [ ] Gemini/OpenAI secrets not deployed live
 [ ] Real subscription/payment provider not connected
-[ ] Public Privacy Policy URL not hosted yet
-[ ] Public Terms URL not hosted yet
 [ ] Final legal review pending
+```
+
+## Current Public URLs
+
+```text
+Website: https://hersaathi-60899.web.app
+Privacy Policy: https://hersaathi-60899.web.app/privacy-policy
+Terms of Use: https://hersaathi-60899.web.app/terms-of-use
+Medical & AI Safety: https://hersaathi-60899.web.app/medical-ai-safety
+Data Deletion: https://hersaathi-60899.web.app/data-deletion
 ```

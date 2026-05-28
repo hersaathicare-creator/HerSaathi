@@ -17,6 +17,8 @@ Billing-dependent services remain intentionally deferred:
 4. Screenshot plan for Play Store assets.
 5. Tester feedback form.
 6. Store submission checklist.
+7. Firebase Hosting configuration for public policy pages.
+8. App config URLs wired to the public policy pages.
 
 ## Official References
 
@@ -42,19 +44,25 @@ docs/store/public/medical-ai-safety.html
 docs/store/public/data-deletion.html
 ```
 
-## Hosting The Public Policy Pages
+## Hosted Public Policy Pages
 
-Before Play Store submission, host the files in:
+The files in:
 
 ```text
 docs/store/public/
 ```
 
-Recommended hosting options:
+are configured for Firebase Hosting.
 
-1. Firebase Hosting
-2. GitHub Pages
-3. Any stable HTTPS website you control
+Current public URLs:
+
+```text
+Website: https://hersaathi-60899.web.app
+Privacy Policy: https://hersaathi-60899.web.app/privacy-policy
+Terms of Use: https://hersaathi-60899.web.app/terms-of-use
+Medical & AI Safety: https://hersaathi-60899.web.app/medical-ai-safety
+Data Deletion: https://hersaathi-60899.web.app/data-deletion
+```
 
 Google Play needs a working public Privacy Policy URL. The URL must not be private, broken, or hidden behind login.
 
@@ -67,7 +75,7 @@ Google Play needs a working public Privacy Policy URL. The URL must not be priva
 5. Paste full description from `PLAY_STORE_LISTING.md`.
 6. Upload app icon and feature graphic.
 7. Upload phone screenshots.
-8. Add hosted Privacy Policy URL.
+8. Add hosted Privacy Policy URL: `https://hersaathi-60899.web.app/privacy-policy`.
 9. Complete Data Safety form using `DATA_SAFETY_DRAFT.md`.
 10. Complete Content Rating.
 11. Complete Target Audience.
@@ -84,5 +92,6 @@ Phase 7 is complete when:
 5. Tester feedback form exists.
 6. Store release checklist exists.
 7. Docs are committed and pushed.
+8. Public policy URLs are hosted and reachable.
 
 Phase 7 does not require billing, cloud deploy, or Play Console submission.

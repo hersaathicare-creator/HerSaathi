@@ -1,5 +1,6 @@
 node_modules/
 .expo/
+.firebase/
 .expo-export-test/
 .expo-server*.log
 .expo-*.log

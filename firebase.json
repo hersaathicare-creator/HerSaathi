@@ -2,6 +2,16 @@
   "firestore": {
     "rules": "firestore.rules"
   },
+  "hosting": {
+    "site": "hersaathi-60899",
+    "public": "docs/store/public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "cleanUrls": true
+  },
   "functions": [
     {
       "source": "functions",

@@ -75,9 +75,10 @@ Women's health
 
 ```text
 Developer email: her.saathi.care@gmail.com
-Website: pending
-Privacy Policy URL: pending hosted URL
-Terms URL: pending hosted URL
+Website: https://hersaathi-60899.web.app
+Privacy Policy URL: https://hersaathi-60899.web.app/privacy-policy
+Terms URL: https://hersaathi-60899.web.app/terms-of-use
+Data Deletion URL: https://hersaathi-60899.web.app/data-deletion
 ```
 
 ## Reviewer Notes Draft

@@ -104,8 +104,8 @@ Before internal/closed testing:
 1. App name: `HerSaathi`
 2. Package name: `com.hersaathi.app`
 3. Official email: `her.saathi.care@gmail.com`
-4. Privacy Policy URL hosted publicly.
-5. Terms URL hosted publicly.
+4. Privacy Policy URL hosted publicly: `https://hersaathi-60899.web.app/privacy-policy`.
+5. Terms URL hosted publicly: `https://hersaathi-60899.web.app/terms-of-use`.
 6. App icon and feature graphic ready.
 7. Phone screenshots ready.
 8. App category selected.

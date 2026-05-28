@@ -41,9 +41,15 @@ Before public release, connect:
 1. Real payment/subscription system.
 2. Automated Premium entitlement creation.
 3. Server-side account deletion workflow.
-4. Store-hosted public Privacy Policy URL.
-5. Store-hosted public Terms URL.
-6. Crash reporting and analytics consent.
+4. Crash reporting and analytics consent.
+
+Public policy URLs are now prepared through Firebase Hosting:
+
+```text
+Privacy Policy: https://hersaathi-60899.web.app/privacy-policy
+Terms of Use: https://hersaathi-60899.web.app/terms-of-use
+Data Deletion: https://hersaathi-60899.web.app/data-deletion
+```
 
 ## Store Listing Preparation
 

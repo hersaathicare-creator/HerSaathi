@@ -35,6 +35,9 @@
     ],
     "extra": {
       "officialEmail": "her.saathi.care@gmail.com",
+      "privacyPolicyUrl": "https://hersaathi-60899.web.app/privacy-policy",
+      "termsUrl": "https://hersaathi-60899.web.app/terms-of-use",
+      "dataDeletionUrl": "https://hersaathi-60899.web.app/data-deletion",
       "cloudProvider": "Cloud Firestore",
       "authProvider": "Google",
       "androidPackage": "com.hersaathi.app",

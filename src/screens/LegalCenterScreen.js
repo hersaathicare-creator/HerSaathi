@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Linking, Modal, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { FileText, HeartPulse, Mail, ShieldCheck, Trash2, X } from "lucide-react-native";
+import { ExternalLink, FileText, HeartPulse, Mail, ShieldCheck, Trash2, X } from "lucide-react-native";
 
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
@@ -46,6 +46,15 @@ export default function LegalCenterScreen({ appState, onClose }) {
     }
   };
 
+  const openPublicUrl = async (url, label) => {
+    try {
+      await Linking.openURL(url);
+      setStatus(`Opened ${label}.`);
+    } catch {
+      setStatus(`Open ${url} to view ${label}.`);
+    }
+  };
+
   return (
     <Modal visible animationType="slide" presentationStyle="fullScreen">
       <SafeAreaView style={styles.shell} edges={["top", "bottom"]}>
@@ -72,6 +81,22 @@ export default function LegalCenterScreen({ appState, onClose }) {
           </Card>
 
           <HealthDisclaimer />
+
+          <Card>
+            <View style={styles.titleRow}>
+              <ExternalLink size={20} color={colors.plum} />
+              <Text style={styles.cardTitle}>Public policy pages</Text>
+            </View>
+            <Text style={styles.body}>
+              These are the same public pages used for Play Store review and privacy support.
+            </Text>
+            <View style={styles.linkGrid}>
+              <Button title="Privacy Policy" variant="secondary" onPress={() => openPublicUrl(appConfig.privacyPolicyUrl, "Privacy Policy")} style={styles.linkButton} />
+              <Button title="Terms of Use" variant="secondary" onPress={() => openPublicUrl(appConfig.termsUrl, "Terms of Use")} style={styles.linkButton} />
+              <Button title="Medical & AI Safety" variant="secondary" onPress={() => openPublicUrl(appConfig.medicalSafetyUrl, "Medical & AI Safety")} style={styles.linkButton} />
+              <Button title="Data Deletion" variant="secondary" onPress={() => openPublicUrl(appConfig.dataDeletionUrl, "Data Deletion")} style={styles.linkButton} />
+            </View>
+          </Card>
 
           {legalDocuments.map((document) => (
             <Card key={document.key}>
@@ -199,6 +224,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
     marginTop: 14
+  },
+  linkGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginTop: 14
+  },
+  linkButton: {
+    flexGrow: 1,
+    flexBasis: "46%",
+    minWidth: 140
   },
   actionButton: {
     flex: 1
