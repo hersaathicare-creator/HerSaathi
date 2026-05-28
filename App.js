@@ -26,7 +26,8 @@ import ReportsScreen from "./src/screens/ReportsScreen";
 import TrackScreen from "./src/screens/TrackScreen";
 import { Button } from "./src/components/Button";
 import { colors, fonts, layout, typography } from "./src/constants/theme";
-import { loadAppState } from "./src/utils/storage";
+import { watchFirebaseUser } from "./src/services/firebase";
+import { loadAppState, saveSignedInAccount } from "./src/utils/storage";
 
 const logo = require("./image/logo.png");
 
@@ -172,6 +173,15 @@ export default function App() {
       mounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = watchFirebaseUser(async (user) => {
+      if (!user) return;
+      await saveSignedInAccount(user);
+      await refreshAppState();
+    });
+    return unsubscribe;
+  }, [refreshAppState]);
 
   const completeOnboarding = useCallback(
     async () => {

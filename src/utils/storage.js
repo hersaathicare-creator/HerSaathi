@@ -4,6 +4,7 @@ import { toDateKey } from "./date";
 export const storageKeys = {
   onboardingComplete: "hersaathi:onboardingComplete",
   profile: "hersaathi:profile",
+  account: "hersaathi:account",
   cycle: "hersaathi:cycle",
   notifications: "hersaathi:notifications",
   checkIns: "hersaathi:checkIns",
@@ -21,6 +22,29 @@ const defaultState = {
     gmailConnected: false,
     cloudSync: false,
     subscription: "free"
+  },
+  account: {
+    status: "guest",
+    provider: null,
+    email: null,
+    displayName: null,
+    uid: null,
+    photoURL: null,
+    syncEnabled: false,
+    syncStatus: "local-only",
+    lastSyncCheckAt: null,
+    lastCloudUploadAt: null,
+    lastCloudDownloadAt: null,
+    lastCloudDeleteAt: null,
+    cloudProvider: "Cloud Firestore",
+    syncConsent: false,
+    dataScopes: {
+      cycle: true,
+      periodEntries: true,
+      symptomLogs: true,
+      checkIns: true,
+      aiMessages: false
+    }
   },
   cycle: {
     lastPeriodDate: null,
@@ -62,6 +86,7 @@ export async function loadAppState() {
   const [
     onboardingComplete,
     profile,
+    account,
     cycle,
     notifications,
     checkIns,
@@ -72,6 +97,7 @@ export async function loadAppState() {
   ] = await Promise.all([
     getJSON(storageKeys.onboardingComplete, defaultState.onboardingComplete),
     getJSON(storageKeys.profile, defaultState.profile),
+    getJSON(storageKeys.account, defaultState.account),
     getJSON(storageKeys.cycle, defaultState.cycle),
     getJSON(storageKeys.notifications, defaultState.notifications),
     getJSON(storageKeys.checkIns, defaultState.checkIns),
@@ -84,6 +110,11 @@ export async function loadAppState() {
   return {
     onboardingComplete,
     profile: { ...defaultState.profile, ...profile },
+    account: {
+      ...defaultState.account,
+      ...account,
+      dataScopes: { ...defaultState.account.dataScopes, ...(account?.dataScopes || {}) }
+    },
     cycle: { ...defaultState.cycle, ...cycle },
     notifications: { ...defaultState.notifications, ...notifications },
     checkIns,
@@ -112,6 +143,113 @@ export async function saveNotificationSettings(settings) {
 
 export async function saveProfile(profile) {
   return setJSON(storageKeys.profile, profile);
+}
+
+export async function saveAccount(account) {
+  const next = {
+    ...defaultState.account,
+    ...account,
+    dataScopes: { ...defaultState.account.dataScopes, ...(account?.dataScopes || {}) }
+  };
+  return setJSON(storageKeys.account, next);
+}
+
+export async function updateCloudSyncSettings(patch) {
+  const account = await getJSON(storageKeys.account, defaultState.account);
+  const next = {
+    ...defaultState.account,
+    ...account,
+    ...patch,
+    dataScopes: {
+      ...defaultState.account.dataScopes,
+      ...(account?.dataScopes || {}),
+      ...(patch?.dataScopes || {})
+    }
+  };
+
+  if (patch.syncEnabled === true) {
+    next.syncConsent = true;
+    next.syncStatus = next.status === "signed-in" ? "ready" : "auth-needed";
+  }
+
+  if (patch.syncEnabled === false) {
+    next.syncStatus = "paused";
+  }
+
+  await setJSON(storageKeys.account, next);
+  return next;
+}
+
+export async function runLocalSyncReadinessCheck() {
+  const account = await getJSON(storageKeys.account, defaultState.account);
+  const next = {
+    ...defaultState.account,
+    ...account,
+    lastSyncCheckAt: new Date().toISOString(),
+    syncStatus: account.status === "signed-in" ? "ready" : "auth-needed"
+  };
+  await setJSON(storageKeys.account, next);
+  return next;
+}
+
+export async function saveSignedInAccount(user, patch = {}) {
+  const account = await getJSON(storageKeys.account, defaultState.account);
+  const next = {
+    ...defaultState.account,
+    ...account,
+    ...patch,
+    status: "signed-in",
+    provider: "google",
+    uid: user.uid,
+    email: user.email,
+    displayName: user.displayName,
+    photoURL: user.photoURL,
+    syncStatus: patch.syncStatus || (account.syncEnabled ? "ready" : "signed-in"),
+    lastSyncCheckAt: new Date().toISOString(),
+    dataScopes: { ...defaultState.account.dataScopes, ...(account?.dataScopes || {}), ...(patch?.dataScopes || {}) }
+  };
+
+  await Promise.all([
+    setJSON(storageKeys.account, next),
+    getJSON(storageKeys.profile, defaultState.profile).then((profile) =>
+      setJSON(storageKeys.profile, {
+        ...profile,
+        name: profile.name || user.displayName || "Saathi",
+        gmailConnected: true,
+        cloudSync: Boolean(next.syncEnabled)
+      })
+    )
+  ]);
+
+  return next;
+}
+
+export async function markCloudSync(patch) {
+  const account = await getJSON(storageKeys.account, defaultState.account);
+  const next = {
+    ...defaultState.account,
+    ...account,
+    ...patch,
+    dataScopes: { ...defaultState.account.dataScopes, ...(account?.dataScopes || {}) }
+  };
+  await setJSON(storageKeys.account, next);
+  return next;
+}
+
+export async function signOutAccount() {
+  const account = await getJSON(storageKeys.account, defaultState.account);
+  const next = {
+    ...defaultState.account,
+    dataScopes: { ...defaultState.account.dataScopes, ...(account?.dataScopes || {}) },
+    syncStatus: "signed-out"
+  };
+  await Promise.all([
+    setJSON(storageKeys.account, next),
+    getJSON(storageKeys.profile, defaultState.profile).then((profile) =>
+      setJSON(storageKeys.profile, { ...profile, gmailConnected: false, cloudSync: false })
+    )
+  ]);
+  return next;
 }
 
 export function getTodayCheckIn(checkIns = []) {
@@ -226,7 +364,7 @@ export async function exportLocalData() {
   return {
     exportedAt: new Date().toISOString(),
     app: "HerSaathi",
-    version: 1,
+    version: 2,
     data: state
   };
 }
@@ -235,6 +373,11 @@ export async function restoreLocalData(data) {
   const nextState = {
     onboardingComplete: Boolean(data.onboardingComplete),
     profile: { ...defaultState.profile, ...(data.profile || {}) },
+    account: {
+      ...defaultState.account,
+      ...(data.account || {}),
+      dataScopes: { ...defaultState.account.dataScopes, ...(data.account?.dataScopes || {}) }
+    },
     cycle: { ...defaultState.cycle, ...(data.cycle || {}) },
     notifications: { ...defaultState.notifications, ...(data.notifications || {}) },
     checkIns: Array.isArray(data.checkIns) ? data.checkIns : [],
@@ -247,6 +390,7 @@ export async function restoreLocalData(data) {
   await Promise.all([
     setJSON(storageKeys.onboardingComplete, nextState.onboardingComplete),
     setJSON(storageKeys.profile, nextState.profile),
+    setJSON(storageKeys.account, nextState.account),
     setJSON(storageKeys.cycle, nextState.cycle),
     setJSON(storageKeys.notifications, nextState.notifications),
     setJSON(storageKeys.checkIns, nextState.checkIns),
@@ -257,6 +401,27 @@ export async function restoreLocalData(data) {
   ]);
 
   return loadAppState();
+}
+
+export async function applyCloudWellnessData(cloudData) {
+  const current = await loadAppState();
+  const incoming = cloudData?.data || {};
+  const nextState = {
+    ...current,
+    profile: incoming.profile ? { ...current.profile, ...incoming.profile } : current.profile,
+    cycle: incoming.cycle ? { ...current.cycle, ...incoming.cycle } : current.cycle,
+    periodEntries: Array.isArray(incoming.periodEntries) ? incoming.periodEntries : current.periodEntries,
+    symptomLogs: Array.isArray(incoming.symptomLogs) ? incoming.symptomLogs : current.symptomLogs,
+    checkIns: Array.isArray(incoming.checkIns) ? incoming.checkIns : current.checkIns,
+    aiMessages: Array.isArray(incoming.aiMessages) ? incoming.aiMessages : current.aiMessages,
+    account: {
+      ...current.account,
+      lastCloudDownloadAt: new Date().toISOString(),
+      syncStatus: "synced"
+    }
+  };
+
+  return restoreLocalData(nextState);
 }
 
 export async function resetLocalData() {

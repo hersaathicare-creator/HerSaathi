@@ -78,7 +78,9 @@ export default function DataManagementScreen({ appState, refreshAppState, onClos
               <Metric label="Symptoms" value={appState.symptomLogs?.length || 0} />
               <Metric label="Check-ins" value={appState.checkIns?.length || 0} />
             </View>
-            <Text style={styles.body}>Your Stage 1 data is stored on this device with AsyncStorage.</Text>
+            <Text style={styles.body}>
+              Account status: {appState.account?.status || "guest"}. Local records remain on this device until real sync is connected.
+            </Text>
           </Card>
 
           <Card>

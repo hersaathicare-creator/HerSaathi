@@ -4,6 +4,8 @@ const dateKeyPattern = /^\d{4}-\d{2}-\d{2}$/;
 const ageGroups = ["teen", "18-25", "25-35", "35+"];
 const flows = ["light", "medium", "heavy"];
 const moods = ["good", "okay", "bad"];
+const accountStatuses = ["guest", "google-ready", "signed-in"];
+const syncStatuses = ["local-only", "auth-needed", "ready", "paused", "signed-out", "signed-in", "synced", "error"];
 
 export function isValidDateKey(value) {
   if (typeof value !== "string" || !dateKeyPattern.test(value)) return false;
@@ -102,6 +104,7 @@ export function validateImportText(text) {
 
 function normalizeImportData(source, errors) {
   const profile = normalizeProfile(source.profile);
+  const account = normalizeAccount(source.account);
   const cycle = normalizeCycle(source.cycle, errors);
   const notifications = normalizeNotifications(source.notifications);
   const checkIns = normalizeCheckIns(source.checkIns, errors);
@@ -113,6 +116,7 @@ function normalizeImportData(source, errors) {
   return {
     onboardingComplete: Boolean(source.onboardingComplete),
     profile,
+    account,
     cycle,
     notifications,
     checkIns,
@@ -120,6 +124,36 @@ function normalizeImportData(source, errors) {
     symptomLogs,
     aiUsage,
     aiMessages
+  };
+}
+
+function normalizeAccount(account = {}) {
+  const source = asObject(account);
+  const status = accountStatuses.includes(source.status) ? source.status : "guest";
+  const dataScopes = asObject(source.dataScopes);
+
+  return {
+    status,
+    provider: source.provider === "google" ? "google" : null,
+    email: source.email ? safeString(source.email, "").slice(0, 120) : null,
+    displayName: source.displayName ? safeString(source.displayName, "").slice(0, 80) : null,
+    uid: source.uid ? safeString(source.uid, "").slice(0, 160) : null,
+    photoURL: source.photoURL ? safeString(source.photoURL, "").slice(0, 400) : null,
+    syncEnabled: Boolean(source.syncEnabled),
+    syncStatus: syncStatuses.includes(source.syncStatus) ? source.syncStatus : "local-only",
+    lastSyncCheckAt: source.lastSyncCheckAt ? safeString(source.lastSyncCheckAt, "") : null,
+    lastCloudUploadAt: source.lastCloudUploadAt ? safeString(source.lastCloudUploadAt, "") : null,
+    lastCloudDownloadAt: source.lastCloudDownloadAt ? safeString(source.lastCloudDownloadAt, "") : null,
+    lastCloudDeleteAt: source.lastCloudDeleteAt ? safeString(source.lastCloudDeleteAt, "") : null,
+    cloudProvider: safeString(source.cloudProvider, "Cloud Firestore"),
+    syncConsent: Boolean(source.syncConsent),
+    dataScopes: {
+      cycle: dataScopes.cycle !== false,
+      periodEntries: dataScopes.periodEntries !== false,
+      symptomLogs: dataScopes.symptomLogs !== false,
+      checkIns: dataScopes.checkIns !== false,
+      aiMessages: Boolean(dataScopes.aiMessages)
+    }
   };
 }
 

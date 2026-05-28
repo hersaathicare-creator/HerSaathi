@@ -29,6 +29,11 @@
       "expo-notifications",
       "expo-font",
       "expo-asset"
-    ]
+    ],
+    "extra": {
+      "officialEmail": "her.saathi.care@gmail.com",
+      "cloudProvider": "Cloud Firestore",
+      "authProvider": "Google"
+    }
   }
 }
