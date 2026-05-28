@@ -1,0 +1,11 @@
+node_modules/
+.expo/
+.expo-export-test/
+.expo-server*.log
+.expo-*.log
+.expo-*-export-test/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
