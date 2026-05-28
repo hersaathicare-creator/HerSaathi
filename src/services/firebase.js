@@ -1,7 +1,15 @@
 import { Platform } from "react-native";
 import { initializeApp, getApp, getApps } from "firebase/app";
-import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithCredential,
+  signInWithPopup,
+  signOut
+} from "firebase/auth";
 import { deleteDoc, doc, getDoc, getFirestore, serverTimestamp, setDoc } from "firebase/firestore";
+import { appConfig } from "../constants/app";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCMQgFkhtQXT6TTPC4Z3b-sKSer5neTB4s",
@@ -29,12 +37,24 @@ export function watchFirebaseUser(callback) {
 }
 
 export async function signInWithGoogle() {
-  assertWebAuth();
+  if (Platform.OS !== "web") {
+    return signInWithGoogleNative();
+  }
+
   const result = await signInWithPopup(auth, provider);
   return mapFirebaseUser(result.user);
 }
 
 export async function signOutGoogle() {
+  if (Platform.OS !== "web") {
+    try {
+      const { GoogleSignin } = require("@react-native-google-signin/google-signin");
+      await GoogleSignin.signOut();
+    } catch {
+      // Firebase sign-out below is still the source of truth for app state.
+    }
+  }
+
   await signOut(auth);
 }
 
@@ -95,10 +115,29 @@ function mapFirebaseUser(user) {
   };
 }
 
-function assertWebAuth() {
-  if (Platform.OS !== "web") {
-    throw new Error("Google sign-in is connected for web. Android/iOS need native OAuth client IDs in the next build step.");
+async function signInWithGoogleNative() {
+  if (!appConfig.androidGoogleWebClientId) {
+    throw new Error("Android Google sign-in needs the Web client ID from Google Cloud/Firebase. Add it to src/constants/app.js after Firebase Android setup.");
   }
+
+  const { GoogleSignin } = require("@react-native-google-signin/google-signin");
+  GoogleSignin.configure({
+    webClientId: appConfig.androidGoogleWebClientId,
+    offlineAccess: false,
+    profileImageSize: 120
+  });
+
+  await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+  const response = await GoogleSignin.signIn();
+  const idToken = response?.data?.idToken || response?.idToken;
+
+  if (!idToken) {
+    throw new Error("Google did not return an ID token. Check Firebase Android SHA-1/SHA-256 and Web client ID setup.");
+  }
+
+  const credential = GoogleAuthProvider.credential(idToken);
+  const result = await signInWithCredential(auth, credential);
+  return mapFirebaseUser(result.user);
 }
 
 function assertSignedIn(uid) {

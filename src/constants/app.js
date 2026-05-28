@@ -3,7 +3,10 @@ export const appConfig = {
   officialEmail: "her.saathi.care@gmail.com",
   supportMailto: "mailto:her.saathi.care@gmail.com",
   authProvider: "Google",
-  cloudProvider: "Cloud Firestore"
+  cloudProvider: "Cloud Firestore",
+  androidPackage: "com.hersaathi.app",
+  androidGoogleWebClientId: "",
+  androidGoogleClientId: ""
 };
 
 export const syncScopes = [

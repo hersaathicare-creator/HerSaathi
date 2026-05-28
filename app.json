@@ -4,6 +4,7 @@
     "slug": "hersaathi",
     "version": "1.0.0",
     "orientation": "portrait",
+    "scheme": "hersaathi",
     "icon": "./image/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
@@ -23,17 +24,20 @@
         "foregroundImage": "./image/icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.hersaathi.app"
+      "package": "com.hersaathi.app",
+      "versionCode": 1
     },
     "plugins": [
       "expo-notifications",
       "expo-font",
-      "expo-asset"
+      "expo-asset",
+      "@react-native-google-signin/google-signin"
     ],
     "extra": {
       "officialEmail": "her.saathi.care@gmail.com",
       "cloudProvider": "Cloud Firestore",
-      "authProvider": "Google"
+      "authProvider": "Google",
+      "androidPackage": "com.hersaathi.app"
     }
   }
 }
