@@ -23,6 +23,24 @@ docs/store/assets/phone-screenshots/04-relief-mode.png
 docs/store/assets/phone-screenshots/05-ask-ai-saathi.png
 docs/store/assets/phone-screenshots/06-profile-privacy.png
 docs/store/assets/phone-screenshots/07-reports-insights.png
+
+7-inch tablet screenshots:
+docs/store/assets/tablet-7-inch-screenshots/01-home-dashboard.png
+docs/store/assets/tablet-7-inch-screenshots/02-track-period-entry.png
+docs/store/assets/tablet-7-inch-screenshots/03-symptom-logging.png
+docs/store/assets/tablet-7-inch-screenshots/04-relief-mode.png
+docs/store/assets/tablet-7-inch-screenshots/05-ask-ai-saathi.png
+docs/store/assets/tablet-7-inch-screenshots/06-profile-privacy.png
+docs/store/assets/tablet-7-inch-screenshots/07-reports-insights.png
+
+10-inch tablet screenshots:
+docs/store/assets/tablet-10-inch-screenshots/01-home-dashboard.png
+docs/store/assets/tablet-10-inch-screenshots/02-track-period-entry.png
+docs/store/assets/tablet-10-inch-screenshots/03-symptom-logging.png
+docs/store/assets/tablet-10-inch-screenshots/04-relief-mode.png
+docs/store/assets/tablet-10-inch-screenshots/05-ask-ai-saathi.png
+docs/store/assets/tablet-10-inch-screenshots/06-profile-privacy.png
+docs/store/assets/tablet-10-inch-screenshots/07-reports-insights.png
 ```
 
 ## Verified Sizes
@@ -31,7 +49,11 @@ docs/store/assets/phone-screenshots/07-reports-insights.png
 App icon: 512 x 512 PNG
 Feature graphic: 1024 x 500 PNG
 Phone screenshots: 1080 x 1920 PNG
+7-inch tablet screenshots: 1080 x 1920 PNG
+10-inch tablet screenshots: 1440 x 2560 PNG
 ```
+
+All screenshot sets use the 9:16 portrait ratio and are under 8 MB per file.
 
 ## Suggested Alt Text
 

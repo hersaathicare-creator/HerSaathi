@@ -14,6 +14,32 @@ Captured assets:
 6. `docs/store/assets/phone-screenshots/06-profile-privacy.png`
 7. `docs/store/assets/phone-screenshots/07-reports-insights.png`
 
+## Required Tablet Screenshots
+
+7-inch tablet screenshots:
+
+```text
+docs/store/assets/tablet-7-inch-screenshots/
+```
+
+10-inch tablet screenshots:
+
+```text
+docs/store/assets/tablet-10-inch-screenshots/
+```
+
+Both tablet folders contain:
+
+```text
+01-home-dashboard.png
+02-track-period-entry.png
+03-symptom-logging.png
+04-relief-mode.png
+05-ask-ai-saathi.png
+06-profile-privacy.png
+07-reports-insights.png
+```
+
 ## Suggested Caption Copy
 
 Use short captions if you design framed screenshots later:
