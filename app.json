@@ -2,7 +2,7 @@
   "expo": {
     "name": "HerSaathi",
     "slug": "hersaathi",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "scheme": "hersaathi",
     "icon": "./image/icon.png",
@@ -25,13 +25,25 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.hersaathi.app",
-      "versionCode": 4
+      "versionCode": 5
     },
     "plugins": [
       "expo-notifications",
       "expo-font",
       "expo-asset",
-      "@react-native-google-signin/google-signin"
+      "@react-native-google-signin/google-signin",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0",
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
+        }
+      ]
     ],
     "extra": {
       "officialEmail": "her.saathi.care@gmail.com",
