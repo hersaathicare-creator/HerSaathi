@@ -4,17 +4,15 @@ Google Play preview assets should show the real app experience, not marketing-on
 
 ## Required Phone Screenshots Draft
 
-Capture at least these:
+Captured assets:
 
-1. Home dashboard
-2. Cycle status and daily check-in
-3. Track period entry
-4. Symptom logging
-5. Relief Mode
-6. Ask AI with Saathi
-7. Pragya Premium locked state
-8. Reports
-9. Profile with Legal & Safety / Testing Center
+1. `docs/store/assets/phone-screenshots/01-home-dashboard.png`
+2. `docs/store/assets/phone-screenshots/02-track-period-entry.png`
+3. `docs/store/assets/phone-screenshots/03-symptom-logging.png`
+4. `docs/store/assets/phone-screenshots/04-relief-mode.png`
+5. `docs/store/assets/phone-screenshots/05-ask-ai-saathi.png`
+6. `docs/store/assets/phone-screenshots/06-profile-privacy.png`
+7. `docs/store/assets/phone-screenshots/07-reports-insights.png`
 
 ## Suggested Caption Copy
 
@@ -41,17 +39,16 @@ Control your data and privacy
 
 ## Feature Graphic Draft
 
-Google Play feature graphic is commonly used across store surfaces. Prepare a clean graphic with:
+Google Play feature graphic is commonly used across store surfaces. Current prepared file:
 
 ```text
-HerSaathi
-Simple period & wellness companion
+docs/store/assets/feature-graphic.png
 ```
 
 Style:
 
-1. White background
+1. White/lavender background
 2. Lavender/plum accents
-3. Logo visible
+3. Plum wordmark/monogram
 4. No crowded text
 5. No medical claims

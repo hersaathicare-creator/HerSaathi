@@ -5,8 +5,8 @@ This is the phone-testing round for the latest APK build.
 ## QA Build Target
 
 ```text
-App version: 1.0.1
-Android versionCode: 3
+App version: 1.0.2
+Android versionCode: 4
 Package: com.hersaathi.app
 Build profile: preview
 Build type: APK
@@ -32,10 +32,10 @@ npx eas-cli build --platform android --profile preview --non-interactive
 EAS build result:
 
 ```text
-EAS build URL: https://expo.dev/accounts/sanjeevmazumder/projects/hersaathi/builds/c031e6dc-b94f-4f0a-b0bb-e5075d40a610
-APK download URL: https://expo.dev/artifacts/eas/pJvYGhodACvuzypgy1cgUU.apk
+EAS build URL: https://expo.dev/accounts/sanjeevmazumder/projects/hersaathi/builds/aa605975-fe90-4b92-b2d8-bb3973e9040a
+APK download URL: https://expo.dev/artifacts/eas/n3fwk3CR8pp8udrJAXr7mj.apk
 Build result: FINISHED
-Completed at: 2026-05-28 17:15:24 UTC
+Completed at: 2026-05-29 07:20:24 UTC
 ```
 
 ## Install On Android Phone
@@ -125,7 +125,7 @@ Do not expect Gemini/OpenAI cloud answers until billing, secrets, and deploy are
 [ ] Invalid import is rejected
 [ ] Delete local data asks for confirmation
 [ ] Testing & Store Prep opens
-[ ] Tester diagnostics details show app version 1.0.1 and versionCode 3
+[ ] Tester diagnostics details show app version 1.0.2 and versionCode 4
 ```
 
 ## Google Login And Sync Test
