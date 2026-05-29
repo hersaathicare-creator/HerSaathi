@@ -15,7 +15,7 @@ export const storageKeys = {
   legalConsent: "hersaathi:legalConsent"
 };
 
-const defaultState = {
+export const defaultState = {
   onboardingComplete: false,
   profile: {
     name: "Saathi",

@@ -25,6 +25,13 @@ const ageOptions = [
   { label: "35+", value: "35+" }
 ];
 
+function withTimeout(promise, timeoutMs) {
+  return Promise.race([
+    promise,
+    new Promise((resolve) => setTimeout(resolve, timeoutMs))
+  ]);
+}
+
 export default function OnboardingScreen({ onComplete }) {
   const [step, setStep] = useState(0);
   const [ageGroup, setAgeGroup] = useState("18-25");
@@ -63,16 +70,23 @@ export default function OnboardingScreen({ onComplete }) {
       return;
     }
 
-    await completeOnboarding({ ageGroup, cycle, notificationsEnabled, legalConsent: buildLegalConsent() });
-
-    if (notificationsEnabled) {
-      await scheduleHerSaathiNotifications(
-        { enabled: true, dailyCheckIn: true, periodReminder: true, wellnessTip: true },
-        getCycleInfo(cycle)
+    try {
+      await withTimeout(
+        completeOnboarding({ ageGroup, cycle, notificationsEnabled, legalConsent: buildLegalConsent() }),
+        5000
       );
+    } catch {
+      setMessage("Setup is continuing. You can update details later from tracking.");
     }
 
-    onComplete();
+    onComplete({ ageGroup, cycle, notificationsEnabled });
+
+    if (notificationsEnabled) {
+      scheduleHerSaathiNotifications(
+        { enabled: true, dailyCheckIn: true, periodReminder: true, wellnessTip: true },
+        getCycleInfo(cycle)
+      ).catch(() => {});
+    }
   };
 
   return (

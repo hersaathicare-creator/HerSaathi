@@ -30,9 +30,11 @@ import TrackScreen from "./src/screens/TrackScreen";
 import { Button } from "./src/components/Button";
 import { colors, fonts, layout, typography } from "./src/constants/theme";
 import { watchFirebaseUser } from "./src/services/firebase";
-import { loadAppState, saveSignedInAccount } from "./src/utils/storage";
+import { defaultState, loadAppState, saveSignedInAccount } from "./src/utils/storage";
 
 const logo = require("./image/logo.png");
+const bootTimeoutMs = 6500;
+const fontTimeoutMs = 4500;
 
 const tabs = [
   { key: "home", label: "Home", icon: Home },
@@ -154,6 +156,7 @@ function MainApp({ appState, refreshAppState, completeOnboarding }) {
 function AppRoot() {
   const [booting, setBooting] = useState(true);
   const [appState, setAppState] = useState(null);
+  const [fontsTimedOut, setFontsTimedOut] = useState(false);
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
@@ -165,18 +168,36 @@ function AppRoot() {
     DMSans_600SemiBold,
     DMSans_700Bold
   });
+  const fontsReady = fontsLoaded || fontsTimedOut;
+
+  useEffect(() => {
+    if (fontsLoaded) return undefined;
+    const timer = setTimeout(() => setFontsTimedOut(true), fontTimeoutMs);
+    return () => clearTimeout(timer);
+  }, [fontsLoaded]);
+
+  const loadStateSafely = useCallback(async () => {
+    try {
+      return await Promise.race([
+        loadAppState(),
+        new Promise((resolve) => setTimeout(() => resolve(defaultState), bootTimeoutMs))
+      ]);
+    } catch {
+      return defaultState;
+    }
+  }, []);
 
   const refreshAppState = useCallback(async () => {
-    const nextState = await loadAppState();
+    const nextState = await loadStateSafely();
     setAppState(nextState);
     return nextState;
-  }, []);
+  }, [loadStateSafely]);
 
   useEffect(() => {
     let mounted = true;
     const boot = async () => {
       const minimumSplash = new Promise((resolve) => setTimeout(resolve, 1300));
-      const state = await loadAppState();
+      const state = await loadStateSafely();
       await minimumSplash;
       if (mounted) {
         setAppState(state);
@@ -187,33 +208,48 @@ function AppRoot() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [loadStateSafely]);
 
   useEffect(() => {
     const unsubscribe = watchFirebaseUser(async (user) => {
       if (!user) return;
-      await saveSignedInAccount(user);
-      await refreshAppState();
+      try {
+        await saveSignedInAccount(user);
+        await refreshAppState();
+      } catch {
+        // Keep the app usable if restoring a Firebase session fails during boot.
+      }
     });
     return unsubscribe;
   }, [refreshAppState]);
 
   const completeOnboarding = useCallback(
-    async () => {
-      const state = await loadAppState();
+    async (fallback = {}) => {
+      const state = await loadStateSafely();
       setAppState({
         ...state,
-        onboardingComplete: true
+        onboardingComplete: true,
+        profile: {
+          ...state.profile,
+          ageGroup: fallback.ageGroup || state.profile.ageGroup
+        },
+        cycle: {
+          ...state.cycle,
+          ...(fallback.cycle || {})
+        },
+        notifications: {
+          ...state.notifications,
+          enabled: fallback.notificationsEnabled ?? state.notifications.enabled
+        }
       });
-      await refreshAppState();
     },
-    [refreshAppState]
+    [loadStateSafely]
   );
 
-  if (booting || !appState || !fontsLoaded) {
+  if (booting || !appState || !fontsReady) {
     return (
       <SafeAreaProvider>
-        <SplashScreen fontsLoaded={fontsLoaded} />
+        <SplashScreen fontsLoaded={fontsReady} />
       </SafeAreaProvider>
     );
   }
