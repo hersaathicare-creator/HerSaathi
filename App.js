@@ -34,7 +34,6 @@ import { defaultState, loadAppState, saveSignedInAccount } from "./src/utils/sto
 
 const logo = require("./image/logo.png");
 const bootTimeoutMs = 6500;
-const fontTimeoutMs = 4500;
 
 const tabs = [
   { key: "home", label: "Home", icon: Home },
@@ -154,10 +153,8 @@ function MainApp({ appState, refreshAppState, completeOnboarding }) {
 }
 
 function AppRoot() {
-  const [booting, setBooting] = useState(true);
-  const [appState, setAppState] = useState(null);
-  const [fontsTimedOut, setFontsTimedOut] = useState(false);
-  const [fontsLoaded] = useFonts({
+  const [appState, setAppState] = useState(defaultState);
+  useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
     Poppins_600SemiBold,
@@ -168,13 +165,6 @@ function AppRoot() {
     DMSans_600SemiBold,
     DMSans_700Bold
   });
-  const fontsReady = fontsLoaded || fontsTimedOut;
-
-  useEffect(() => {
-    if (fontsLoaded) return undefined;
-    const timer = setTimeout(() => setFontsTimedOut(true), fontTimeoutMs);
-    return () => clearTimeout(timer);
-  }, [fontsLoaded]);
 
   const loadStateSafely = useCallback(async () => {
     try {
@@ -195,38 +185,39 @@ function AppRoot() {
 
   useEffect(() => {
     let mounted = true;
-    const boot = async () => {
-      const minimumSplash = new Promise((resolve) => setTimeout(resolve, 1300));
-      const state = await loadStateSafely();
-      await minimumSplash;
-      if (mounted) {
-        setAppState(state);
-        setBooting(false);
-      }
-    };
-    boot();
+    loadStateSafely().then((state) => {
+      if (!mounted) return;
+      setAppState((current) => {
+        if (current.onboardingComplete && !state.onboardingComplete) return current;
+        return state;
+      });
+    });
     return () => {
       mounted = false;
     };
   }, [loadStateSafely]);
 
   useEffect(() => {
-    const unsubscribe = watchFirebaseUser(async (user) => {
-      if (!user) return;
-      try {
-        await saveSignedInAccount(user);
-        await refreshAppState();
-      } catch {
-        // Keep the app usable if restoring a Firebase session fails during boot.
-      }
-    });
-    return unsubscribe;
+    let unsubscribe = () => {};
+    try {
+      unsubscribe = watchFirebaseUser(async (user) => {
+        if (!user) return;
+        try {
+          await saveSignedInAccount(user);
+          await refreshAppState();
+        } catch {
+          // Keep the app usable if restoring a Firebase session fails during boot.
+        }
+      });
+    } catch {
+      // Auth restore should never block the local app shell.
+    }
+    return () => unsubscribe?.();
   }, [refreshAppState]);
 
   const completeOnboarding = useCallback(
-    async (fallback = {}) => {
-      const state = await loadStateSafely();
-      setAppState({
+    (fallback = {}) => {
+      setAppState((state) => ({
         ...state,
         onboardingComplete: true,
         profile: {
@@ -241,18 +232,10 @@ function AppRoot() {
           ...state.notifications,
           enabled: fallback.notificationsEnabled ?? state.notifications.enabled
         }
-      });
+      }));
     },
-    [loadStateSafely]
+    []
   );
-
-  if (booting || !appState || !fontsReady) {
-    return (
-      <SafeAreaProvider>
-        <SplashScreen fontsLoaded={fontsReady} />
-      </SafeAreaProvider>
-    );
-  }
 
   return (
     <SafeAreaProvider>
