@@ -5,11 +5,11 @@ This is the phone-testing round for the latest APK build.
 ## QA Build Target
 
 ```text
-App version: 1.0.2
-Android versionCode: 4
+App version: 1.0.8
+Android versionCode: 10
 Package: com.hersaathi.app
-Build profile: preview
-Build type: APK
+Build system: Local Gradle
+Build type: Release APK
 Official email: her.saathi.care@gmail.com
 ```
 
@@ -26,22 +26,20 @@ Run from the project folder:
 
 ```powershell
 cd D:\App\HerSaathi
-npx eas-cli build --platform android --profile preview --non-interactive
+.\build-apk.bat
 ```
 
-EAS build result:
+Local APK output:
 
 ```text
-EAS build URL: https://expo.dev/accounts/sanjeevmazumder/projects/hersaathi/builds/aa605975-fe90-4b92-b2d8-bb3973e9040a
-APK download URL: https://expo.dev/artifacts/eas/n3fwk3CR8pp8udrJAXr7mj.apk
-Build result: FINISHED
-Completed at: 2026-05-29 07:20:24 UTC
+android\app\build\outputs\apk\release\app-release.apk
+dist\HerSaathi-local-release.apk
 ```
 
 ## Install On Android Phone
 
-1. Open the EAS build URL.
-2. Download the APK.
+1. Connect the phone by USB or copy `dist\HerSaathi-local-release.apk` to the phone.
+2. Open the APK on the phone.
 3. If Android blocks install, tap **Settings**.
 4. Allow install from this source.
 5. Install HerSaathi.
@@ -50,7 +48,7 @@ Completed at: 2026-05-29 07:20:24 UTC
 If an older HerSaathi APK is already installed and installation fails:
 
 1. Export/backup any local test data if needed.
-2. Uninstall the old HerSaathi app.
+2. Uninstall the old HerSaathi app if the signing key changed.
 3. Install the new APK again.
 
 ## Fresh Install Test
@@ -125,7 +123,7 @@ Do not expect Gemini/OpenAI cloud answers until billing, secrets, and deploy are
 [ ] Invalid import is rejected
 [ ] Delete local data asks for confirmation
 [ ] Testing & Store Prep opens
-[ ] Tester diagnostics details show app version 1.0.2 and versionCode 4
+[ ] Tester diagnostics details show app version 1.0.8 and versionCode 10
 ```
 
 ## Google Login And Sync Test

@@ -15,3 +15,10 @@ build/
 *.key
 *.pem
 *.p12
+*.jks
+*.keystore
+hs_err_pid*.log
+/logo_edited.png
+android/hs_err_pid*.log
+android/signing/release-signing.properties
+android/signing/*.passwords.txt

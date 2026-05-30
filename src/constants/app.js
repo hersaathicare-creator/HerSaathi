@@ -7,7 +7,6 @@ export const appConfig = {
   authProvider: "Google",
   cloudProvider: "Cloud Firestore",
   firebaseProjectId: "hersaathi-60899",
-  easProjectId: "dfd5ce95-ff2d-4e19-bf55-5af5a3407559",
   legalHomeUrl: "https://hersaathi-60899.web.app",
   privacyPolicyUrl: "https://hersaathi-60899.web.app/privacy-policy",
   termsUrl: "https://hersaathi-60899.web.app/terms-of-use",

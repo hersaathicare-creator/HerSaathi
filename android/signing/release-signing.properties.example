@@ -1,0 +1,4 @@
+HERSAATHI_UPLOAD_STORE_FILE=signing/hersaathi-upload-key.jks
+HERSAATHI_UPLOAD_STORE_PASSWORD=replace-with-store-password
+HERSAATHI_UPLOAD_KEY_ALIAS=hersaathi-upload
+HERSAATHI_UPLOAD_KEY_PASSWORD=replace-with-key-password

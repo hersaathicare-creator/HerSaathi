@@ -25,7 +25,12 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.hersaathi.app",
-      "versionCode": 10
+      "versionCode": 10,
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ]
     },
     "plugins": [
       "expo-notifications",
@@ -50,10 +55,7 @@
       "dataDeletionUrl": "https://hersaathi-60899.web.app/data-deletion",
       "cloudProvider": "Cloud Firestore",
       "authProvider": "Google",
-      "androidPackage": "com.hersaathi.app",
-      "eas": {
-        "projectId": "dfd5ce95-ff2d-4e19-bf55-5af5a3407559"
-      }
+      "androidPackage": "com.hersaathi.app"
     },
     "owner": "sanjeevmazumder"
   }

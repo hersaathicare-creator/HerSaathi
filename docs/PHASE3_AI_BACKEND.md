@@ -451,8 +451,8 @@ npx firebase-tools deploy --only firestore:rules
 Check:
 
 1. Android package name is `com.hersaathi.app`.
-2. EAS SHA-1 is added in Firebase Android app.
-3. EAS SHA-256 is added in Firebase Android app.
+2. Local Android release keystore SHA-1 is added in Firebase Android app.
+3. Local Android release keystore SHA-256 is added in Firebase Android app.
 4. `src/constants/app.js` contains the Web client ID.
 
 ## 19. Phase 3 Completion Checklist

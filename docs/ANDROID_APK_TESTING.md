@@ -1,84 +1,31 @@
 # HerSaathi Android APK Testing
 
-This guide is for the first real phone test build.
+HerSaathi now uses local Android Gradle builds. EAS cloud builds are no longer required for APK or AAB generation.
 
-## 1. Commit Current Work
+## 1. Build The APK
 
 Open PowerShell:
 
 ```powershell
 cd D:\App\HerSaathi
-git status
-git add .
-git commit -m "Prepare Android APK testing and native Google auth"
-git push
+.\build-apk.bat
 ```
 
-## 2. Sign In To Expo
+The APK is created at:
 
-Run:
+```text
+dist\HerSaathi-local-release.apk
+```
+
+## 2. Get Android SHA Fingerprints
+
+Use the local release keystore fingerprints from `android\signing\README.md`, or run:
 
 ```powershell
-npx eas-cli login
+keytool -list -v -keystore android\signing\hersaathi-upload-key.jks -alias hersaathi-upload
 ```
 
-If you do not have an Expo account:
-
-1. Go to https://expo.dev/signup
-2. Create an account.
-3. Return to PowerShell.
-4. Run `npx eas login` again.
-
-## 3. Connect The Project To EAS
-
-Run:
-
-```powershell
-npx eas-cli init
-```
-
-When Expo asks to create or link a project:
-
-1. Choose **Create a new project** if this app is not already in Expo.
-2. Project name: `HerSaathi`
-3. Accept the default values.
-
-This may update `app.json` with an EAS project id.
-
-## 4. Build The First APK
-
-Run:
-
-```powershell
-npm run build:android:apk
-```
-
-When EAS asks about Android credentials:
-
-1. Choose **Generate new keystore**.
-2. Let Expo manage the credentials.
-3. Wait for the build to finish.
-
-The output should be an `.apk` link that can be installed on an Android phone.
-
-## 5. Get Android SHA Fingerprints
-
-After the first EAS build has created Android credentials, run:
-
-```powershell
-npx eas-cli credentials --platform android
-```
-
-Then:
-
-1. Select the HerSaathi project.
-2. Select Android.
-3. Select package `com.hersaathi.app`.
-4. Open the keystore/certificate details.
-5. Copy the SHA-1 fingerprint.
-6. Copy the SHA-256 fingerprint if shown.
-
-## 6. Add Android App In Firebase
+## 3. Add Android App In Firebase
 
 Open Firebase Console:
 
@@ -100,11 +47,11 @@ com.hersaathi.app
 HerSaathi Android
 ```
 
-9. Add SHA-1 fingerprint from EAS.
+9. Add SHA-1 fingerprint from the local release keystore.
 10. Add SHA-256 fingerprint if Firebase offers the field.
 11. Click **Register app**.
 
-## 7. Get The Web Client ID
+## 4. Get The Web Client ID
 
 In Firebase / Google Cloud:
 
@@ -127,17 +74,17 @@ androidGoogleWebClientId: "PASTE_WEB_CLIENT_ID_HERE"
 
 Do not paste secrets or private keys.
 
-## 8. Build APK Again
+## 5. Build APK Again
 
 Run:
 
 ```powershell
-npm run build:android:apk
+.\build-apk.bat
 ```
 
 Install the new APK on your phone.
 
-## 9. Phone Test Checklist
+## 6. Phone Test Checklist
 
 On the phone:
 

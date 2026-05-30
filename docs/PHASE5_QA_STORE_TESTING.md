@@ -24,8 +24,8 @@ Billing-dependent work remains intentionally deferred:
 
 Use these as the source of truth when publishing:
 
-1. Expo production builds: https://docs.expo.dev/deploy/build-project/
-2. Expo Android production build: https://docs.expo.dev/tutorial/eas/android-production-build/
+1. Local Android build guide: `LOCAL_BUILD_GUIDE.md`
+2. Play Store release guide: `docs/PLAY_STORE_RELEASE_GUIDE.md`
 3. Google Play internal/open/closed testing: https://support.google.com/googleplay/android-developer/answer/9845334
 4. Google Play Data safety: https://support.google.com/googleplay/android-developer/answer/10787469
 
@@ -85,14 +85,12 @@ cd D:\App\HerSaathi
 npm run build:android:production
 ```
 
-This uses the `production` profile in `eas.json`, which builds an AAB.
+This runs the local Android Gradle `bundleRelease` task and does not use EAS cloud builds.
 
 Before uploading a new AAB, increase:
 
-```json
-"android": {
-  "versionCode": 10
-}
+```powershell
+npm run version:android -- 1.0.9 11
 ```
 
 Every Play Store upload needs a higher version code than the previous upload.

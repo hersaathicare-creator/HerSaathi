@@ -8,7 +8,6 @@ export function buildDiagnostics(appState = {}) {
     androidPackage: appConfig.androidPackage,
     androidVersionCode: appConfig.androidVersionCode,
     firebaseProjectId: appConfig.firebaseProjectId,
-    easProjectId: appConfig.easProjectId,
     officialEmail: appConfig.officialEmail,
     accountStatus: account.status || "guest",
     signedInEmail: account.email || null,
