@@ -9,7 +9,10 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build:android:apk": "npx eas-cli build --platform android --profile preview",
-    "build:android:production": "npx eas-cli build --platform android --profile production"
+    "build:android:production": "npx eas-cli build --platform android --profile production",
+    "prebuild:android:local": "expo prebuild --platform android --no-install",
+    "build:android:local:apk": "cd android && gradlew.bat assembleRelease --no-daemon --max-workers=2",
+    "build:android:local:aab": "cd android && gradlew.bat bundleRelease --no-daemon --max-workers=2"
   },
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.4.2",
