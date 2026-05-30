@@ -91,7 +91,7 @@ Before uploading a new AAB, increase:
 
 ```json
 "android": {
-  "versionCode": 9
+  "versionCode": 10
 }
 ```
 

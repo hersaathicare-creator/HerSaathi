@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { Bot, CalendarDays, HeartPulse, Moon, PenLine, Plus, Sparkles } from "lucide-react-native";
 
 import { Button } from "../components/Button";
@@ -9,6 +9,8 @@ import { Screen } from "../components/Screen";
 import { colors, fonts, typography } from "../constants/theme";
 import { getCycleInfo } from "../utils/cycle";
 import { addDailyCheckIn, getTodayCheckIn } from "../utils/storage";
+
+const homeLogo = require("../../image/logo_edited.png");
 
 const moodOptions = [
   { label: "Good", value: "good" },
@@ -49,9 +51,12 @@ export default function HomeScreen({ appState, refreshAppState, navigate }) {
   return (
     <Screen contentContainerStyle={styles.screen}>
       <FadeInView style={styles.header}>
-        <Text style={styles.eyebrow}>Today</Text>
-        <Text style={styles.greeting}>Hi {appState.profile.name || "Saathi"}</Text>
-        <Text style={styles.subtle}>A calm snapshot of your cycle and wellness.</Text>
+        <View style={styles.headerCopy}>
+          <Text style={styles.eyebrow}>Today</Text>
+          <Text style={styles.greeting}>Hi {appState.profile.name || "Saathi"}</Text>
+          <Text style={styles.subtle}>A calm snapshot of your cycle and wellness.</Text>
+        </View>
+        <Image source={homeLogo} resizeMode="contain" style={styles.homeLogo} />
       </FadeInView>
 
       <FadeInView delay={80}>
@@ -136,7 +141,20 @@ const styles = StyleSheet.create({
     gap: 16
   },
   header: {
-    gap: 4
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 12
+  },
+  headerCopy: {
+    flex: 1,
+    gap: 4,
+    paddingTop: 4
+  },
+  homeLogo: {
+    width: 76,
+    height: 76,
+    borderRadius: 18
   },
   eyebrow: {
     ...typography.smallMedium,

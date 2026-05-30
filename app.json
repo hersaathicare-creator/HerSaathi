@@ -2,10 +2,10 @@
   "expo": {
     "name": "HerSaathi",
     "slug": "hersaathi",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "orientation": "portrait",
     "scheme": "hersaathi",
-    "icon": "./image/icon.png",
+    "icon": "./image/icon-safe.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./image/logo.png",
@@ -21,11 +21,11 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./image/icon.png",
+        "foregroundImage": "./image/adaptive-icon-foreground.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.hersaathi.app",
-      "versionCode": 9
+      "versionCode": 10
     },
     "plugins": [
       "expo-notifications",
