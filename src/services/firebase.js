@@ -6,7 +6,7 @@ import {
   onAuthStateChanged,
   signInWithCredential,
   signInWithPopup,
-  signOut
+  signOut as firebaseSignOut
 } from "firebase/auth";
 import { deleteDoc, doc, getDoc, getFirestore, serverTimestamp, setDoc } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -27,6 +27,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const functions = getFunctions(app, "asia-south1");
 const provider = new GoogleAuthProvider();
+const authActionTimeoutMs = 5000;
 
 provider.setCustomParameters({ prompt: "select_account" });
 
@@ -48,16 +49,28 @@ export async function signInWithGoogle() {
 }
 
 export async function signOutGoogle() {
+  const tasks = [];
+
   if (Platform.OS !== "web") {
     try {
       const { GoogleSignin } = require("@react-native-google-signin/google-signin");
-      await GoogleSignin.signOut();
+
+      if (appConfig.androidGoogleWebClientId) {
+        GoogleSignin.configure({
+          webClientId: appConfig.androidGoogleWebClientId,
+          offlineAccess: false,
+          profileImageSize: 120
+        });
+      }
+
+      tasks.push(withTimeout(GoogleSignin.signOut(), authActionTimeoutMs).catch(() => null));
     } catch {
       // Firebase sign-out below is still the source of truth for app state.
     }
   }
 
-  await signOut(auth);
+  tasks.push(withTimeout(firebaseSignOut(auth), authActionTimeoutMs).catch(() => null));
+  await Promise.all(tasks);
 }
 
 export async function uploadWellnessData(uid, payload) {
@@ -147,6 +160,10 @@ async function signInWithGoogleNative() {
   const credential = GoogleAuthProvider.credential(idToken);
   const result = await signInWithCredential(auth, credential);
   return mapFirebaseUser(result.user);
+}
+
+function withTimeout(promise, timeoutMs) {
+  return Promise.race([promise, new Promise((resolve) => setTimeout(resolve, timeoutMs))]);
 }
 
 function assertSignedIn(uid) {

@@ -83,13 +83,18 @@ export default function ProfileScreen({ appState, refreshAppState, navigate }) {
   const signOut = async () => {
     try {
       setWorking("logout");
+      setConfirmClearAccount(false);
+      await signOutAccount();
+      await refreshAppState();
       await signOutGoogle();
       await signOutAccount();
       await refreshAppState();
-      setConfirmClearAccount(false);
       setStatus("Signed out. Local wellness records stayed on this device.");
     } catch (error) {
-      setStatus(error.message || "Sign out could not be completed.");
+      await signOutAccount();
+      await refreshAppState();
+      setConfirmClearAccount(false);
+      setStatus("Signed out locally. If Google still appears connected, tap Check Session once.");
     } finally {
       setWorking("");
     }
@@ -280,7 +285,13 @@ export default function ProfileScreen({ appState, refreshAppState, navigate }) {
         </Text>
         <View style={styles.actionRow}>
           {signedIn ? (
-            <Button title={working === "logout" ? "Signing out..." : "Sign out"} variant="secondary" onPress={() => setConfirmClearAccount(true)} style={styles.actionButton}>
+            <Button
+              title={working === "logout" ? "Signing out..." : "Sign out"}
+              variant="secondary"
+              onPress={() => setConfirmClearAccount(true)}
+              disabled={working === "logout"}
+              style={styles.actionButton}
+            >
               <LogOut size={18} color={colors.mulberry} />
               <Text style={styles.secondaryText}>{working === "logout" ? "Signing out..." : "Sign out"}</Text>
             </Button>
@@ -296,6 +307,20 @@ export default function ProfileScreen({ appState, refreshAppState, navigate }) {
           </Button>
         </View>
       </Card>
+
+      {confirmClearAccount ? (
+        <Card style={styles.dangerCard}>
+          <View style={styles.titleRow}>
+            <Trash2 size={20} color={colors.warning} />
+            <Text style={styles.cardTitle}>Sign out?</Text>
+          </View>
+          <Text style={styles.body}>This signs out Google and pauses sync. Local wellness records stay on this device.</Text>
+          <View style={styles.actionRow}>
+            <Button title="Cancel" variant="secondary" onPress={() => setConfirmClearAccount(false)} disabled={working === "logout"} style={styles.actionButton} />
+            <Button title={working === "logout" ? "Signing out..." : "Sign out"} onPress={signOut} disabled={working === "logout"} style={styles.actionButton} />
+          </View>
+        </Card>
+      ) : null}
 
       <Card>
         <View style={styles.titleRow}>
@@ -363,20 +388,6 @@ export default function ProfileScreen({ appState, refreshAppState, navigate }) {
           <View style={styles.actionRow}>
             <Button title="Cancel" variant="secondary" onPress={() => setConfirmCloudDelete(false)} style={styles.actionButton} />
             <Button title={working === "delete-cloud" ? "Deleting..." : "Delete Cloud"} onPress={deleteCloudBackup} disabled={working === "delete-cloud"} style={styles.actionButton} />
-          </View>
-        </Card>
-      ) : null}
-
-      {confirmClearAccount ? (
-        <Card style={styles.dangerCard}>
-          <View style={styles.titleRow}>
-            <Trash2 size={20} color={colors.warning} />
-            <Text style={styles.cardTitle}>Sign out?</Text>
-          </View>
-          <Text style={styles.body}>This signs out Google and pauses sync. Local wellness records stay on this device.</Text>
-          <View style={styles.actionRow}>
-            <Button title="Cancel" variant="secondary" onPress={() => setConfirmClearAccount(false)} style={styles.actionButton} />
-            <Button title="Sign out" onPress={signOut} style={styles.actionButton} />
           </View>
         </Card>
       ) : null}
